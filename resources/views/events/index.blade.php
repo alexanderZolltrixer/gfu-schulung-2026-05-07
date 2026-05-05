@@ -52,6 +52,9 @@
                         <!-- Using Carbon Casting -->
                         {{ $event->start_date->format('D, d.M Y') }}
                     </div>
+                    <div class="flex items-right gap-1">
+                        <a href="{{ route('events.edit', ['event' => $event]) }}">edit</a>
+                    </div>
                 </div>
             </div>
         @empty
