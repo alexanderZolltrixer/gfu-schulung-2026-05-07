@@ -71,4 +71,12 @@ class EventController extends Controller
 
         return $redirection->with('error', 'Unable to update event.');
     }
+
+    public function remove(Event $event)
+    {
+        $event->delete();
+
+        return redirect()->route('events.index')
+            ->with('success', __('Event ":event" removed successfully.', ['event' => $event->title]));
+    }
 }
