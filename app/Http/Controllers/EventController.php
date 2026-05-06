@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Enums\EventType;
+use App\Exceptions\UnableToCreateEventException;
 use App\Http\Requests\CreateEventRequest;
 use App\Http\Requests\EditEventRequest;
+use App\Interfaces\Services\EventServiceInterface;
 use App\Models\Event;
 use App\Models\Trainer;
 use Illuminate\Http\RedirectResponse;
@@ -12,14 +14,13 @@ use Illuminate\View\View;
 
 class EventController extends Controller
 {
+    public function __construct(
+        protected EventServiceInterface $service,
+    ) {}
+
     public function index(): View
     {
-        $trainer = Trainer::find(2);
-
-        $events = Event::query()->with(Event::RELATION_TRAINER)->get();
-        //$events = Event::upcoming()->with(Event::RELATION_TRAINER)->get();
-        //$events = Event::fromTrainer($trainer)->with(Event::RELATION_TRAINER)->get();
-        //$events = Event::upcoming()->fromTrainer($trainer)->with(Event::RELATION_TRAINER)->get();
+        $events = $this->service->getEvents();
 
         return view('events.index', [
             'title' => 'GFU Training Schedule',
@@ -36,16 +37,16 @@ class EventController extends Controller
     {
         $data = $request->validated();
 
-        $event = new Event();
-        $event->fill($data);
-
         $redirection = redirect()->route('events.index');
 
-        if ($event->save()) {
-            return $redirection->with('success', __('Event created successfully.', ['event' => $event]));
+        try {
+            $event = $this->service->createEvent($data);
+        } catch (UnableToCreateEventException $e) {
+            return $redirection->with('error', __('Unable to create event.'));
         }
 
-        return $redirection->with('error', __('Unable to create event.', ['event' => $event]));
+        return $redirection->with('success', __('Event created successfully.', ['event' => $event]));
+
     }
 
     public function edit(Event $event): View
