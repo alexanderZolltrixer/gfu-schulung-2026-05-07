@@ -36,7 +36,7 @@
                     <select name="trainer_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm border p-2">
                         <option value="" class="hidden">-- Trainer auswählen --</option>
                         @foreach($trainers as $trainer)
-                            <option value="{{ $trainer->getKey() }}" {{ old('trainer_id', isset($event) && $event->trainer?->getKey()) == $trainer->getKey() ? 'selected' : '' }}>
+                            <option value="{{ $trainer->getKey() }}" {{ old('trainer_id', isset($event) ? $event->trainer?->getKey() : null) == $trainer->getKey() ? 'selected' : '' }}>
                                 {{ $trainer->name }}
                             </option>
                         @endforeach
