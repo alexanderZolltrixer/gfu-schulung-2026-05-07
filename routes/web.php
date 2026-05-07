@@ -32,5 +32,5 @@ Route::prefix('api')->group(function () {
 });
 
 // Chart Routes
-Route::get('/charts/event-statistics', [ChartController::class, 'eventStatistics']);
-Route::get('/charts/event-statistics/pdf', [ChartController::class, 'eventStatisticsPdf']);
+Route::get('/charts/event-statistics', [ChartController::class, 'eventStatistics'])->name('charts.eventStatistics');
+Route::get('/charts/event-statistics/pdf', [ChartController::class, 'eventStatisticsPdf'])->name('charts.eventStatisticsPdf');
