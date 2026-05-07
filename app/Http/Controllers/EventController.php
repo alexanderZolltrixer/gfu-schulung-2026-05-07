@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\UpsertEventAction;
 use App\Data\EventData;
 use App\Enums\EventType;
 use App\Exceptions\UnableToCreateEventException;
+use App\Exceptions\UnableToUpsertEventException;
 use App\Http\Requests\CreateEventRequest;
 use App\Http\Requests\EditEventRequest;
 use App\Interfaces\Services\EventServiceInterface;
@@ -35,18 +37,17 @@ class EventController extends Controller
         return $this->form();
     }
 
-    public function store(EventData $data)
+    public function store(EventData $data, UpsertEventAction $action): RedirectResponse
     {
         $redirection = redirect()->route('events.index');
 
         try {
-            $event = $this->service->createEvent($data);
-        } catch (UnableToCreateEventException $e) {
+            $event = $action->execute($data);
+        } catch (UnableToUpsertEventException $e) {
             return $redirection->with('error', __('Unable to create event.'));
         }
 
-        return $redirection->with('success', __('Event created successfully.', ['event' => $event]));
-
+        return $redirection->with('success', __('Event ":event" created successfully.', ['event' => $event]));
     }
 
     public function edit(Event $event): View
@@ -65,21 +66,17 @@ class EventController extends Controller
         ], $data));
     }
 
-    public function save(Event $event, EditEventRequest $request)
+    public function save(Event $event, EventData $data, UpsertEventAction $action): RedirectResponse
     {
-        $data = $request->validated();
-
-        $event->fill($data);
-
-        $event->tags()->sync($data['tags']);
-
         $redirection = redirect()->route('events.index');
 
-        if ($event->save()) {
-            return $redirection->with('success', __('Event ":event" updated successfully.', ['event' => $event]));
+        try {
+            $action->execute($data, $event);
+        } catch (UnableToUpsertEventException $e) {
+            return $redirection->with('error', __('Unable to update event ":event".', ['event' => $event]));
         }
 
-        return $redirection->with('error', __('Unable to update event ":event".', ['event' => $event]));
+        return $redirection->with('success', __('Event ":event" updated successfully.', ['event' => $event]));
     }
 
     public function remove(Event $event): RedirectResponse
