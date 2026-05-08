@@ -46,6 +46,8 @@ class ChartController extends Controller
 
     private function captureChartWithPuppeteer(array $chartData): string
     {
+        $chromePath = config('services.chrome.path');
+
         // Erstelle temporäre HTML-Datei
         $tempDir = storage_path('temp');
         if (!is_dir($tempDir)) {
@@ -67,14 +69,20 @@ const path = require('path');
 (async () => {
     const htmlFile = process.argv[2];
     const pngFile = process.argv[3];
+    const chromePath = process.argv[4];
 
     let browser;
     try {
-        browser = await puppeteer.launch({
+        const launchOptions = {
             headless: 'new',
-            executablePath: '/usr/bin/google-chrome',
             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
-        });
+        };
+
+        if (chromePath) {
+            launchOptions.executablePath = chromePath;
+        }
+
+        browser = await puppeteer.launch(launchOptions);
 
         const page = await browser.newPage();
         await page.setViewport({ width: 1400, height: 700 });
@@ -113,7 +121,8 @@ SCRIPT;
             'node',
             $scriptFile,
             $htmlFile,
-            $pngFile
+            $pngFile,
+            $chromePath ?? ''
         ]);
 
         $process->setTimeout(60);

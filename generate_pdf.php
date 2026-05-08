@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\View as ViewFacade;
 try {
     $chart = new EventStatisticsChart();
     $chartData = $chart->getChartData();
+    $chromePath = config('services.chrome.path');
 
     $tempDir = storage_path('temp');
     if (!is_dir($tempDir)) {
@@ -35,11 +36,12 @@ const path = require('path');
 (async () => {
     const htmlFile = process.argv[2];
     const pngFile  = process.argv[3];
+    const chromePath = process.argv[4];
     let browser;
     try {
         browser = await puppeteer.launch({
             headless: 'new',
-            executablePath: '/usr/bin/google-chrome',
+            executablePath: chromePath,
             args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
         });
         const page = await browser.newPage();
@@ -68,7 +70,7 @@ SCRIPT;
 
     file_put_contents($scriptFile, $scriptContent);
 
-    $process = new Process(['node', $scriptFile, $htmlFile, $pngFile]);
+    $process = new Process(['node', $scriptFile, $htmlFile, $pngFile, $chromePath ?? '']);
     $process->setTimeout(60);
     $process->run();
 
