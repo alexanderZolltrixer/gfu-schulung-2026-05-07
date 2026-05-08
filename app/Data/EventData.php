@@ -14,14 +14,13 @@ use Spatie\LaravelData\Attributes\Validation\Enum;
 use Spatie\LaravelData\Attributes\Validation\Exists;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Data;
 
 class EventData extends Data
 {
     public function __construct(
-
-        #[Min(5)]
-        #[Max(191)]
+        #[Min(5), Max(191)]
         public string $title,
 
         public string|null $description,
@@ -45,15 +44,15 @@ class EventData extends Data
         #[ArrayType]
         #[ModelExists(Tag::class)]
         public array $tags = [],
-    ) {}
-
+    ) {
+    }
     public function hasTags(): bool
     {
         return 0 < count($this->getTags());
     }
-
     public function getTags(): array
     {
         return $this->tags;
     }
+
 }

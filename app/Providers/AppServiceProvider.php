@@ -45,5 +45,6 @@ class AppServiceProvider extends ServiceProvider
 
             return is_null($error);
         });
+
     }
 }

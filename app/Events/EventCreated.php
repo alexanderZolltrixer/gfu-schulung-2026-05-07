@@ -11,7 +11,7 @@ class EventCreated
     use Dispatchable;
     use SerializesModels;
 
-    public function __construct(
-        public Event $event,
-    ) {}
+    public function __construct(public Event $event,){
+
+    }
 }

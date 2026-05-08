@@ -39,7 +39,7 @@ class EventService implements EventServiceInterface
         }
 
         if ($data->hasTags()) {
-            $event->tags()->attach($data->tags);
+            $event->tags()->attach($data->getTags());
         }
 
         // @TODO send mail to Trainer
